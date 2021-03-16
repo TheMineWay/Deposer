@@ -1,0 +1,16 @@
+B:\Proyectos C#\Deposer\Deposer\Deposer\bin\Debug\net5.0\Deposer.exe
+B:\Proyectos C#\Deposer\Deposer\Deposer\bin\Debug\net5.0\Deposer.deps.json
+B:\Proyectos C#\Deposer\Deposer\Deposer\bin\Debug\net5.0\Deposer.runtimeconfig.json
+B:\Proyectos C#\Deposer\Deposer\Deposer\bin\Debug\net5.0\Deposer.runtimeconfig.dev.json
+B:\Proyectos C#\Deposer\Deposer\Deposer\bin\Debug\net5.0\Deposer.dll
+B:\Proyectos C#\Deposer\Deposer\Deposer\bin\Debug\net5.0\ref\Deposer.dll
+B:\Proyectos C#\Deposer\Deposer\Deposer\bin\Debug\net5.0\Deposer.pdb
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.csprojAssemblyReference.cache
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.GeneratedMSBuildEditorConfig.editorconfig
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.AssemblyInfoInputs.cache
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.AssemblyInfo.cs
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.csproj.CoreCompileInputs.cache
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.dll
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\ref\Deposer.dll
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.pdb
+B:\Proyectos C#\Deposer\Deposer\Deposer\obj\Debug\net5.0\Deposer.genruntimeconfig.cache
