@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "kdzxsQeblOO0XsI74x5LxZCsvj3/KTL61xD05GRCnvuV2w7X5inpSRVEgaTzCKVotl5o9PkuGoPxO5oicDN+Lw==",
+  "dgSpecHash": "SGHXQlsTALFjoIB4o5OW7LndPW9qoz4OsHx+6zwWXjS69tY7go7W0l72vPdT4Cp6Z1Bamm8L2ZhCz6RdGG/V3g==",
   "success": true,
   "projectFilePath": "B:\\Proyectos C#\\Deposer\\Deposer\\Deposer\\Deposer.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\joelc\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
   "logs": []
 }
