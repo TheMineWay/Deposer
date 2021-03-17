@@ -9,71 +9,108 @@ namespace Deposer
 {
     class Navigator
     {
-        public static string Navigate(string startPath, bool directories = true, bool files = true)
-        {
-            //List<Element>
-            foreach(DirectoryInfo directory in (from directory in Directory.GetDirectories(startPath) select new DirectoryInfo(directory)).ToArray())
-            {
-
-            }
-            return startPath;
-        }
 
         public enum Type
         {
             file,
-            directory
+            directory,
+            cancel
         }
-        class Element
+        public class Element
         {
             public string path;
-            public FileInfo file;
             public Type type;
             public Element(string path, Type type) {
                 this.type = type;
                 this.path = path;
-                file = new FileInfo(path);
+            }
+            public Element()
+            {
+                type = Type.cancel;
             }
         }
 
-        public static string FileViewer(string path)
+        public static Element Navigate(DirectoryInfo dir, bool directories = true, bool files = true)
         {
             List<Element> elements = new List<Element>();
-            elements.AddRange((from directory in Directory.GetDirectories(path) select new Element(directory, Type.directory)).ToArray());
-            elements.AddRange((from file in Directory.GetFiles(path) select new Element(file, Type.file)).ToArray());
+            elements.AddRange((from directory in Directory.GetDirectories(dir.FullName) select new Element(directory, Type.directory)).ToArray());
+            if(files) elements.AddRange((from file in Directory.GetFiles(dir.FullName) select new Element(file, Type.file)).ToArray());
 
             List<List<Element>> storedFiles = FilePager(elements.ToArray());
+            elements.Clear();
 
             int page = 0, selected = 0;
             while(true)
             {
-                Console.Clear();
-                Lang.Say("page");
-                foreach(Element element in storedFiles[page])
+                try
                 {
-                    if (element.type == Type.directory) Console.ForegroundColor = Program.config.color_directory;
-                    else Console.ForegroundColor = Program.config.color_file;
-                    Console.WriteLine(element.file.Name);
-                }
-                Console.ForegroundColor = Program.config.color_default; //Reset default color
+                    Console.Clear();
+                    Lang.SayInFormatLn("nav_pages_display", new string[] { (page + 1).ToString(), (storedFiles.ToArray().Length).ToString() });
+                    if(storedFiles.Count <= 0)
+                    {
+                        Document.Inform(Lang.Get("empty_folder"));
+                        Document.PressAny();
+                        return new Element();
+                    }
+                    for (int i = 0; i < storedFiles[page].Count; i++)
+                    {
+                        Element element = storedFiles[page][i];
+                        if (element.type == Type.directory) Console.ForegroundColor = Program.config.color_directory;
+                        else Console.ForegroundColor = Program.config.color_file;
+                        Program.config.Arrow(selected == i);
+                        Console.Write(new FileInfo(element.path).Name + "\n");
+                    }
+                    Console.ForegroundColor = Program.config.color_default; //Reset default color
 
-                //Read user input and process
-                ConsoleKey key = Console.ReadKey().Key;
-                switch(key)
+                    //Read user input and process
+                    ConsoleKey key = Console.ReadKey().Key;
+                    switch (key)
+                    {
+                        case ConsoleKey.RightArrow: Next(); break;
+                        case ConsoleKey.LeftArrow: Back(); break;
+                        case ConsoleKey.UpArrow: Up(); break;
+                        case ConsoleKey.DownArrow: Down(); break;
+                        case ConsoleKey.Escape: return new Element();
+                        case ConsoleKey.Enter:
+                            if (storedFiles[page][selected].type != Type.directory) break;
+                            Element action = Navigate(new DirectoryInfo(storedFiles[page][selected].path), directories, files); //Navigate into directory
+                            if (action.type != Type.cancel) return action;
+                            break;
+                        case ConsoleKey.Spacebar:
+                            if ((storedFiles[page][selected].type == Type.directory && !directories) || (storedFiles[page][selected].type == Type.file && !files)) break;
+                            return new Element(storedFiles[page][selected].path, storedFiles[page][selected].type);
+                    }
+                }
+                catch(Exception e)
                 {
-                    case ConsoleKey.RightArrow: Next(); break;
-                    case ConsoleKey.LeftArrow: Back(); break;
+                    Document.Error(Lang.Get("access_denied"));
                 }
 
                 void Next()
                 {
                     page++;
                     if (page >= storedFiles.ToArray().Length) page = 0;
+                    UpdatePage();
                 }
                 void Back()
                 {
                     page--;
                     if (page < 0) page = storedFiles.ToArray().Length - 1;
+                    UpdatePage();
+                }
+                void UpdatePage()
+                {
+                    if (selected >= storedFiles[page].Count) selected = storedFiles[page].Count - 1;
+                }
+                void Down()
+                {
+                    selected++;
+                    if (selected >= storedFiles[page].Count) selected = 0;
+                }
+                void Up()
+                {
+                    selected--;
+                    if (selected < 0) selected = storedFiles[page].Count - 1;
                 }
             }
         }

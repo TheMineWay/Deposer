@@ -11,12 +11,14 @@ namespace Deposer
             try
             {
                 InitData();
-                Console.Title = "Déposer";
-                Navigator.FileViewer(@"C:/");
             } catch(Exception e)
             {
+                Document.Error(e.Message);
                 Document.Error("Error while initing the program");
+                return;
             }
+            Console.Title = "Déposer";
+            Navigator.Navigate(new DirectoryInfo(@"C:/"), true, true);
         }
 
         static void InitData()

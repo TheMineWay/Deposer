@@ -1,0 +1,7 @@
+{
+  "nav_pages_display": "Page {0} of {1}",
+  "access_denied": "Access denied",
+  "details": "Error details: {0}",
+  "press_any_key": "Press any key to continue",
+  "empty_folder": "The folder is empty, so you can't navigate in it"
+}

@@ -12,13 +12,32 @@ namespace Deposer
         public ConsoleColor color_default =  ConsoleColor.White; //Text's default color
         public ConsoleColor color_file = ConsoleColor.DarkYellow;
         public ConsoleColor color_directory = ConsoleColor.White;
+        public ConsoleColor color_arrow = ConsoleColor.Cyan;
+        public ConsoleColor color_error = ConsoleColor.Red;
+        public ConsoleColor color_information = ConsoleColor.Blue;
 
         /* SYMBOLS */
         public char table_horizontal = '-', table_vertical = '|';
         public string arrow = "-->";
+        public void Arrow(bool display = true)
+        {
+            ConsoleColor current = Console.ForegroundColor;
+            Console.ForegroundColor = color_arrow;
+            if (display) Console.Write(arrow + " ");
+            else
+            {
+                string printer = " ";
+                for (int i = 0; i < arrow.Length; i++) printer += " ";
+                Console.Write(printer);
+            }
+            Console.ForegroundColor = current;
+        }
 
         /* DISPLAY */
         public int file_rows = 15;
-        public int elements_per_page = 6;
+        public int elements_per_page = 18;
+
+        /* ERRORS */
+        public bool skipErrors = false;
     }
 }
