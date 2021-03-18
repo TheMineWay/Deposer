@@ -6,6 +6,11 @@ namespace Deposer
     class Program
     {
         public static Config config = new Config();
+        enum MainOptions
+        {
+            first,
+            second
+        }
         static void Main(string[] args)
         {
             try
@@ -18,7 +23,9 @@ namespace Deposer
                 return;
             }
             Console.Title = "Déposer";
-            Navigator.Navigate(new DirectoryInfo(@"C:/"), true, true);
+            //Navigator.Navigate(new DirectoryInfo(@"A:/"), true, true);
+            //Document.Menu<MainOptions>.DisplayMenu(new Document.Menu<MainOptions>[] { new Document.Menu<MainOptions>("First", MainOptions.first) });
+            //Console.WriteLine(Document.Boxyfy("Hola muy buenas a\ntodo el mundo desde aguacates.\nDa igual lo que pongas, el programa lo mete en una caja él solito", Document.TextStyle.justify));
         }
 
         static void InitData()

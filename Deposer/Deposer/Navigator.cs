@@ -30,14 +30,11 @@ namespace Deposer
             }
         }
 
-        public static Element Navigate(DirectoryInfo dir, bool directories = true, bool files = true)
+        public static Element Navigate(DirectoryInfo dir, bool directories = true, bool files = true, bool selecting = false)
         {
             List<Element> elements = new List<Element>();
-            elements.AddRange((from directory in Directory.GetDirectories(dir.FullName) select new Element(directory, Type.directory)).ToArray());
-            if(files) elements.AddRange((from file in Directory.GetFiles(dir.FullName) select new Element(file, Type.file)).ToArray());
-
-            List<List<Element>> storedFiles = FilePager(elements.ToArray());
-            elements.Clear();
+            List<List<Element>> storedFiles = new List<List<Element>>();
+            GenerateList();
 
             int page = 0, selected = 0;
             while(true)
@@ -45,13 +42,15 @@ namespace Deposer
                 try
                 {
                     Console.Clear();
+                    //Draw toolBox
+                    Console.WriteLine(Document.Boxyfy("SPACE: Select   ENTER: Navigate   ESCAPE: Return\nF: Add file   D: Add directory   R: Remove\nU: Change unity"));
                     Lang.SayInFormatLn("nav_pages_display", new string[] { (page + 1).ToString(), (storedFiles.ToArray().Length).ToString() });
                     if(storedFiles.Count <= 0)
                     {
                         Document.Inform(Lang.Get("empty_folder"));
-                        Document.PressAny();
-                        return new Element();
+                        storedFiles.Add(new List<Element>());
                     }
+                    //Draw files and dirs
                     for (int i = 0; i < storedFiles[page].Count; i++)
                     {
                         Element element = storedFiles[page][i];
@@ -71,12 +70,19 @@ namespace Deposer
                         case ConsoleKey.UpArrow: Up(); break;
                         case ConsoleKey.DownArrow: Down(); break;
                         case ConsoleKey.Escape: return new Element();
+                        case ConsoleKey.D: CreateDir(dir.FullName); GenerateList(); break;
+                        case ConsoleKey.R: if(storedFiles[page].Count > 0) Remove(storedFiles[page][selected]); GenerateList(); break;
                         case ConsoleKey.Enter:
                             if (storedFiles[page][selected].type != Type.directory) break;
-                            Element action = Navigate(new DirectoryInfo(storedFiles[page][selected].path), directories, files); //Navigate into directory
+                            Element action = Navigate(new DirectoryInfo(storedFiles[page][selected].path), directories, files, selecting); //Navigate into directory
                             if (action.type != Type.cancel) return action;
                             break;
                         case ConsoleKey.Spacebar:
+                            if(!selecting)
+                            {
+                                Document.Error(Lang.Get("no_selecting_enabled"));
+                                break;
+                            }
                             if ((storedFiles[page][selected].type == Type.directory && !directories) || (storedFiles[page][selected].type == Type.file && !files)) break;
                             return new Element(storedFiles[page][selected].path, storedFiles[page][selected].type);
                     }
@@ -112,6 +118,84 @@ namespace Deposer
                     selected--;
                     if (selected < 0) selected = storedFiles[page].Count - 1;
                 }
+            }
+
+            void GenerateList()
+            {
+                elements.Clear();
+                storedFiles.Clear();
+                elements.AddRange((from directory in Directory.GetDirectories(dir.FullName) select new Element(directory, Type.directory)).ToArray());
+                if (files) elements.AddRange((from file in Directory.GetFiles(dir.FullName) select new Element(file, Type.file)).ToArray());
+
+                storedFiles = FilePager(elements.ToArray());
+            }
+        }
+        public static void Remove(Element element)
+        {
+            if(element.type == Type.file) Document.Inform(Lang.GetInFormat("confirm_delete_file", new string[] { new FileInfo(element.path).Name }));
+            else if (element.type == Type.directory) Document.Inform(Lang.GetInFormat("confirm_delete_directory", new string[] { new DirectoryInfo(element.path).Name }));
+            if(!Document.GetYesNo())
+            {
+                Document.Error(Lang.Get("cancelled"));
+                return;
+            }
+            if (element.type == Type.file) File.Delete(element.path);
+            else
+            {
+                int files = 0, folders = 0;
+                try
+                {
+                    int[] removed = RemoveFolder(new DirectoryInfo(element.path));
+                    files += removed[0];
+                    folders += removed[1];
+                    folders++;
+                    new DirectoryInfo(element.path).Delete();
+                } catch(Exception e)
+                {
+                    Document.Error("trouble",false,e.Message);
+                }
+                Document.Inform(Lang.GetInFormat("deleted_details",new string[] {files.ToString(),folders.ToString()}));
+                Document.PressAny();
+            }
+            Document.Inform(Lang.Get("completed_deletion"));
+        }
+        public static int[] RemoveFolder(DirectoryInfo directory)
+        {
+            int removedFiles = 0, removedFolders = 0;
+            foreach(DirectoryInfo dir in directory.GetDirectories())
+            {
+                int[] removed = RemoveFolder(dir);
+                removedFiles += removed[0];
+                removedFolders += removed[1];
+                removedFolders++;
+                dir.Delete();
+            }
+            foreach(FileInfo fil in directory.GetFiles())
+            {
+                fil.Delete();
+                removedFiles++;
+            }
+            return new int[] {removedFiles,removedFolders};
+        }
+        public static void CreateDir(string currentPath)
+        {
+            Document.Inform(Lang.Get("create_directory:name") + " ");
+            while(true)
+            {
+                string name = Console.ReadLine();
+                if (name == "") return;
+                else if(!Directory.Exists(currentPath + @$"/{name}"))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(currentPath + @$"/{name}");
+                    } catch(Exception e)
+                    {
+                        Document.Error(Lang.Get("trouble"),false,e.Message);
+                    }
+                    return;
+                }
+                Document.Error(Lang.GetInFormat("directory_already_exists", new string[] {name}));
             }
         }
         private static List<List<Element>> FilePager(Element[] elements)

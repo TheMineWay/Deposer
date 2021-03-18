@@ -17,7 +17,7 @@ namespace Deposer
         public ConsoleColor color_information = ConsoleColor.Blue;
 
         /* SYMBOLS */
-        public char table_horizontal = '-', table_vertical = '|';
+        public char table_horizontal = '-', table_vertical = '|', boxchar = '*';
         public string arrow = "-->";
         public void Arrow(bool display = true)
         {

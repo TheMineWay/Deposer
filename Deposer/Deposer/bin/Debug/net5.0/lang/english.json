@@ -1,7 +1,16 @@
 {
   "nav_pages_display": "Page {0} of {1}",
   "access_denied": "Access denied",
+  "trouble": "An error has ocurred",
   "details": "Error details: {0}",
   "press_any_key": "Press any key to continue",
-  "empty_folder": "The folder is empty, so you can't navigate in it"
+  "empty_folder": "The folder is empty",
+  "create_directory:name": "Specify the name of the new directory:",
+  "directory_already_exists": "The {0} directory already exists",
+  "confirm_delete_file": "Are you sure you want to delete the {0} file?",
+  "confirm_delete_directory": "Are you sure you want to delete the {0} directory?",
+  "cancelled": "Operation cancelled",
+  "completed_deletion": "Deletion completed",
+  "deleted_details": "{0} files have been deleted.\n{1} folders have beeen deleted.",
+  "no_selecting_enabled": "There is no action attached to a selected file/directory"
 }
