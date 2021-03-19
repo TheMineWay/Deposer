@@ -57,7 +57,9 @@ namespace Deposer
                         if (element.type == Type.directory) Console.ForegroundColor = Program.config.color_directory;
                         else Console.ForegroundColor = Program.config.color_file;
                         Program.config.Arrow(selected == i);
-                        Console.Write(new FileInfo(element.path).Name + "\n");
+
+                        FileInfo elem = new FileInfo(element.path);
+                        Console.Write($"{elem.Name}\n");
                     }
                     Console.ForegroundColor = Program.config.color_default; //Reset default color
 

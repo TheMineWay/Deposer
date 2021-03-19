@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace Deposer
 {
@@ -8,11 +9,12 @@ namespace Deposer
         public static Config config = new Config();
         enum MainOptions
         {
-            first,
-            second
+            navigate,
+            exit
         }
         static void Main(string[] args)
         {
+            /* PROGRAM INIT */
             try
             {
                 InitData();
@@ -22,10 +24,37 @@ namespace Deposer
                 Document.Error("Error while initing the program");
                 return;
             }
+            /* ALL LOADED */
             Console.Title = "Déposer";
-            //Navigator.Navigate(new DirectoryInfo(@"A:/"), true, true);
-            //Document.Menu<MainOptions>.DisplayMenu(new Document.Menu<MainOptions>[] { new Document.Menu<MainOptions>("First", MainOptions.first) });
-            //Console.WriteLine(Document.Boxyfy("Hola muy buenas a\ntodo el mundo desde aguacates.\nDa igual lo que pongas, el programa lo mete en una caja él solito", Document.TextStyle.justify));
+
+            /* MAIN MENU */
+            while(true)
+            {
+                MainOptions option = Document.Menu<MainOptions>.DisplayMenu(new Document.Menu<MainOptions>[] {
+                    new Document.Menu<MainOptions>(Lang.Get("menu_navigate"), MainOptions.navigate),
+                    new Document.Menu<MainOptions>(Lang.Get("menu_exit"), MainOptions.exit)
+                });
+                if (option == MainOptions.exit) break;
+                
+                switch(option)
+                {
+                    default: Document.Error(Lang.Get("error:not_implemented")); break;
+                    case MainOptions.navigate: SelectNavigation(); break;
+                }
+            }
+        }
+
+        static void SelectNavigation()
+        {
+            DriveInfo[] units = DriveInfo.GetDrives();Document.Menu<DirectoryInfo>[] options = new Document.Menu<DirectoryInfo>[units.Length];
+            int i = 0;
+            foreach (DriveInfo _unit in units)
+            {
+                options[i] = new Document.Menu<DirectoryInfo>($"{_unit.Name} {_unit.DriveFormat}",new DirectoryInfo(_unit.Name));
+                i++;
+            }
+            DirectoryInfo unit = Document.Menu<DirectoryInfo>.DisplayMenu(options); //Display
+            Navigator.Navigate(unit);
         }
 
         static void InitData()

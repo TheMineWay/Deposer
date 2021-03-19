@@ -12,5 +12,8 @@
   "cancelled": "Operation cancelled",
   "completed_deletion": "Deletion completed",
   "deleted_details": "{0} files have been deleted.\n{1} folders have beeen deleted.",
-  "no_selecting_enabled": "There is no action attached to a selected file/directory"
+  "no_selecting_enabled": "There is no action attached to a selected file/directory",
+  "menu_navigate": "Navigate",
+  "menu_exit": "Exit",
+  "error:not_implemented": "The option has not been implemented yet"
 }

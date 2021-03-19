@@ -105,7 +105,7 @@ namespace Deposer
             else return false;
         }
 
-        public class Menu<T> where T : Enum
+        public class Menu<T>
         {
             public string text;
             public bool enabled;
@@ -132,6 +132,7 @@ namespace Deposer
                 int count = 0, current = 0;
                 foreach(Menu<T> option in options)
                 {
+                    if(count <= 0) processed.Add(new List<Menu<T>>());
                     processed[current].Add(option);
                     count++;
                     if (count >= Program.config.elements_per_page)
@@ -141,10 +142,12 @@ namespace Deposer
                     }
                 }
                 if (processed.Count <= 0) processed.Add(new List<Menu<T>>()); //Empty menu
-
                 int page = 0, selected = 0;
                 while(true)
                 {
+                    Console.Clear();
+                    if(processed.Count() > 1) Lang.SayInFormatLn("nav_pages_display",new string[] {(page + 1).ToString(), processed.Count().ToString()});
+                    //Draw
                     int i = 0;
                     foreach(Menu<T> option in processed[page])
                     {
@@ -157,6 +160,10 @@ namespace Deposer
                     switch(key)
                     {
                         case ConsoleKey.Enter: return processed[page][selected].option;
+                        case ConsoleKey.LeftArrow: Left(); break;
+                        case ConsoleKey.RightArrow: Rigth(); break;
+                        case ConsoleKey.UpArrow: Up(); break;
+                        case ConsoleKey.DownArrow: Down(); break;
                     }
                 }
 
@@ -170,7 +177,78 @@ namespace Deposer
                     selected--;
                     if (selected < 0) selected = processed[page].Count - 1;
                 }
+                void Left()
+                {
+                    page--;
+                    if (page < 0) page = processed.Count() - 1;
+                    AdaptPointer();
+                }
+                void Rigth()
+                {
+                    page++;
+                    if (page >= processed.Count()) page = 0;
+                    AdaptPointer();
+                }
+                void AdaptPointer()
+                {
+                    if (selected >= processed[page].Count) selected = processed[page].Count - 1;
+                }
             }
+        }
+
+        //LOADING TASKS
+        public class Load
+        {
+            Display display;
+            int steps, current;
+
+            public enum Display
+            {
+                onTitle
+            }
+
+            public Load(int steps = 100, int current = 0, Display display = Display.onTitle)
+            {
+                this.display = display;
+                this.current = current;
+                this.steps = steps;
+
+                DoDisplay();
+            }
+
+            public int Progress(int steps = 0)
+            {
+                current += steps;
+                DoDisplay();
+                return current;
+            }
+
+            void DoDisplay()
+            {
+                float stage = (current * 100) / steps;
+                switch(display)
+                {
+                    case Display.onTitle: InTitle(); break;
+                }
+
+                void InTitle()
+                {
+                    Console.Title = $"{ProgressBar(Program.config.progress_bar_len,(int)stage)} {stage}%";
+                }
+            }
+
+            public bool Completed()
+            {
+                return current >= steps;
+            }
+        }
+
+        public static string ProgressBar(int len, int perCent) //Current must be 0-100
+        {
+            int done = perCent > 0 ? (int)Math.Ceiling((decimal)(perCent * len) / 100) : 0;
+            string arrow = done >= len ? "" : Program.config.progress_arrow[1].ToString();
+            string gen = $"{InsertChars(done - 1,Program.config.progress_arrow[0])}{arrow}{InsertChars(len - done - 1, Program.config.progress_arrow[2])}";
+            return $"[{gen}]";
         }
     }
 }

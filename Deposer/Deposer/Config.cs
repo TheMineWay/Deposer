@@ -19,6 +19,7 @@ namespace Deposer
         /* SYMBOLS */
         public char table_horizontal = '-', table_vertical = '|', boxchar = '*';
         public string arrow = "-->";
+        public char[] progress_arrow = new char[] {'-','>',' '}; // Length must be 3
         public void Arrow(bool display = true)
         {
             ConsoleColor current = Console.ForegroundColor;
@@ -36,6 +37,7 @@ namespace Deposer
         /* DISPLAY */
         public int file_rows = 15;
         public int elements_per_page = 18;
+        public int progress_bar_len = 40;
 
         /* ERRORS */
         public bool skipErrors = false;
