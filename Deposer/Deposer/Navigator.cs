@@ -30,7 +30,19 @@ namespace Deposer
             }
         }
 
-        public static Element Navigate(DirectoryInfo dir, bool directories = true, bool files = true, bool selecting = false)
+        public static DirectoryInfo SelectUnit()
+        {
+            DriveInfo[] units = DriveInfo.GetDrives(); Document.Menu<DirectoryInfo>[] options = new Document.Menu<DirectoryInfo>[units.Length];
+            int i = 0;
+            foreach (DriveInfo _unit in units)
+            {
+                options[i] = new Document.Menu<DirectoryInfo>($"{_unit.Name} {_unit.DriveFormat}", new DirectoryInfo(_unit.Name));
+                i++;
+            }
+            DirectoryInfo unit = Document.Menu<DirectoryInfo>.DisplayMenu(options); //Display
+            return unit;
+        }
+        public static Element Navigate(DirectoryInfo dir, bool directories = true, bool files = true, bool selecting = false, string title = "")
         {
             List<Element> elements = new List<Element>();
             List<List<Element>> storedFiles = new List<List<Element>>();
@@ -43,6 +55,7 @@ namespace Deposer
                 {
                     Console.Clear();
                     //Draw toolBox
+                    if(title.Length > 0) Document.Inform(title);
                     Console.WriteLine(Document.Boxyfy("SPACE: Select   ENTER: Navigate   ESCAPE: Return\nF: Add file   D: Add directory   R: Remove\nU: Change unity"));
                     Lang.SayInFormatLn("nav_pages_display", new string[] { (page + 1).ToString(), (storedFiles.ToArray().Length).ToString() });
                     if(storedFiles.Count <= 0)
@@ -76,7 +89,7 @@ namespace Deposer
                         case ConsoleKey.R: if(storedFiles[page].Count > 0) Remove(storedFiles[page][selected]); GenerateList(); break;
                         case ConsoleKey.Enter:
                             if (storedFiles[page][selected].type != Type.directory) break;
-                            Element action = Navigate(new DirectoryInfo(storedFiles[page][selected].path), directories, files, selecting); //Navigate into directory
+                            Element action = Navigate(new DirectoryInfo(storedFiles[page][selected].path), directories, files, selecting, title); //Navigate into directory
                             if (action.type != Type.cancel) return action;
                             break;
                         case ConsoleKey.Spacebar:
@@ -131,6 +144,19 @@ namespace Deposer
 
                 storedFiles = FilePager(elements.ToArray());
             }
+        }
+        public static Element UnitNavigator(bool directories = true, bool files = true, bool selecting = false, string title = "")
+        {
+            DriveInfo[] units = DriveInfo.GetDrives();
+            List<Document.Menu<Element>> elements = new List<Document.Menu<Element>>();
+            foreach (DriveInfo _unit in units)
+            {
+                elements.Add(new Document.Menu<Element>($"{_unit.Name}\t\t{Lang.Get(_unit.DriveType.ToString().ToLower())}\t{_unit.DriveFormat}", new Element(_unit.Name,Type.directory)));
+            }
+            elements.Add(new Document.Menu<Element>(Lang.Get("menu_back"),new Element()));
+            Element element = Document.Menu<Element>.DisplayMenu(elements.ToArray(),title);
+            if (element.type == Type.cancel) return new Element();
+            return Navigate(new DirectoryInfo(element.path),directories,files, selecting,title);
         }
         public static void Remove(Element element)
         {
@@ -199,6 +225,41 @@ namespace Deposer
                 }
                 Document.Error(Lang.GetInFormat("directory_already_exists", new string[] {name}));
             }
+        }
+        public static Element SelectNewFile(string forceExtension = "")
+        {
+            Element dir = UnitNavigator(true, true, true, Lang.Get("select_new_file"));
+            if (dir.type == Type.cancel) return new Element();
+            if (dir.type == Type.file)
+            {
+                Console.WriteLine("\n" + Lang.Get("existing_so_override_file"));
+                if (Document.GetYesNo()) return dir;
+                return SelectNewFile(forceExtension);
+            }
+            string name = GetNewFileName(new DirectoryInfo(dir.path),forceExtension);
+            return new Element(dir.path + @$"/{name}", Type.file);
+        }
+        
+        public static string GetNewFileName(DirectoryInfo dir, string forceExtension = "")
+        {
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("Existing files:");
+                WriteDirInfo(dir, false, true);
+                Console.Write("\n" + Lang.Get("new_file_name") + ": ");
+                string name = Console.ReadLine();
+                if (name.Length < 1) continue;
+                if (forceExtension != "") forceExtension = "." + forceExtension;
+                name += forceExtension;
+                if (File.Exists(dir.FullName + @$"/{name}")) Document.Error(Lang.GetInFormat("file_exists", new string[] { name }));
+                else return name;
+            } while (true);
+        }
+        public static void WriteDirInfo(DirectoryInfo directory, bool directories = true, bool files = true)
+        {
+            if (directories) foreach (DirectoryInfo dir in directory.GetDirectories()) Console.WriteLine(dir.Name);
+            if (files) foreach (FileInfo file in directory.GetFiles()) Console.WriteLine(file.Name);
         }
         private static List<List<Element>> FilePager(Element[] elements)
         {

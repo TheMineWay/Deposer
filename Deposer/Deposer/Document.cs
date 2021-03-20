@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -126,7 +127,7 @@ namespace Deposer
                 Console.ForegroundColor = current;
             }
 
-            public static T DisplayMenu(Menu<T>[] options)
+            public static T DisplayMenu(Menu<T>[] options, string title = "")
             {
                 List<List<Menu<T>>> processed = new List<List<Menu<T>>>();
                 int count = 0, current = 0;
@@ -146,6 +147,7 @@ namespace Deposer
                 while(true)
                 {
                     Console.Clear();
+                    if (title.Length > 0) Console.WriteLine(title + "\n");
                     if(processed.Count() > 1) Lang.SayInFormatLn("nav_pages_display",new string[] {(page + 1).ToString(), processed.Count().ToString()});
                     //Draw
                     int i = 0;

@@ -6,10 +6,12 @@ namespace Deposer
 {
     class Program
     {
+        public readonly static string title = "\n\t██████╗ ███████╗██████╗  ██████╗ ███████╗███████╗██████╗ \n\t██╔══██╗██╔════╝██╔══██╗██╔═══██╗██╔════╝██╔════╝██╔══██╗\n\t██║  ██║█████╗  ██████╔╝██║   ██║███████╗█████╗  ██████╔╝\n\t██║  ██║██╔══╝  ██╔═══╝ ██║   ██║╚════██║██╔══╝  ██╔══██╗\n\t██████╔╝███████╗██║     ╚██████╔╝███████║███████╗██║  ██║\n\t╚═════╝ ╚══════╝╚═╝      ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝                                                         \n\t" + Lang.Get("by") + " TheMineWay";
         public static Config config = new Config();
         enum MainOptions
         {
             navigate,
+            mapper,
             exit
         }
         static void Main(string[] args)
@@ -32,29 +34,55 @@ namespace Deposer
             {
                 MainOptions option = Document.Menu<MainOptions>.DisplayMenu(new Document.Menu<MainOptions>[] {
                     new Document.Menu<MainOptions>(Lang.Get("menu_navigate"), MainOptions.navigate),
+                    new Document.Menu<MainOptions>(Lang.Get("menu_directory_mapper"), MainOptions.mapper),
                     new Document.Menu<MainOptions>(Lang.Get("menu_exit"), MainOptions.exit)
-                });
+                },title);
                 if (option == MainOptions.exit) break;
                 
                 switch(option)
                 {
                     default: Document.Error(Lang.Get("error:not_implemented")); break;
-                    case MainOptions.navigate: SelectNavigation(); break;
+                    case MainOptions.navigate: Navigator.UnitNavigator(); break;
+                    case MainOptions.mapper: MapAssistant(); break;
                 }
             }
         }
 
-        static void SelectNavigation()
+        enum MapOptions
         {
-            DriveInfo[] units = DriveInfo.GetDrives();Document.Menu<DirectoryInfo>[] options = new Document.Menu<DirectoryInfo>[units.Length];
-            int i = 0;
-            foreach (DriveInfo _unit in units)
+            map,
+            exit
+        }
+        static void MapAssistant()
+        {
+            do
             {
-                options[i] = new Document.Menu<DirectoryInfo>($"{_unit.Name} {_unit.DriveFormat}",new DirectoryInfo(_unit.Name));
-                i++;
+                MapOptions option = Document.Menu<MapOptions>.DisplayMenu(new Document.Menu<MapOptions>[] {
+                    new Document.Menu<MapOptions>(Lang.Get("map_menu_dirmap"),MapOptions.map),
+                    new Document.Menu<MapOptions>(Lang.Get("menu_back"), MapOptions.exit)
+                });
+                if (option == MapOptions.exit) break;
+
+                switch(option)
+                {
+                    default: Document.Error(Lang.Get("error:not_implemented")); break;
+                    case MapOptions.map: SaveMap(); break;
+                }
+            } while (true);
+
+            void SaveMap()
+            {
+                // Create a map of a directory
+                Navigator.Element dir = Navigator.UnitNavigator(true, false, true,Lang.Get("createmap_what"));
+                if (dir.type == Navigator.Type.cancel) return;
+                Document.Load process = new Document.Load(1); // 0%
+                Archive.DirectoryMap mapped = new Archive.DirectoryMap(new DirectoryInfo(dir.path));
+                //Navigator.Element where = Navigator.UnitNavigator(true,false,true,Lang.Get("createmap_where")); // Select destination
+                Navigator.Element where = Navigator.SelectNewFile("json");
+                if (where.type == Navigator.Type.cancel) return;
+                File.WriteAllText(where.path, Newtonsoft.Json.JsonConvert.SerializeObject(mapped));
+                process.Completed(); // 100%
             }
-            DirectoryInfo unit = Document.Menu<DirectoryInfo>.DisplayMenu(options); //Display
-            Navigator.Navigate(unit);
         }
 
         static void InitData()

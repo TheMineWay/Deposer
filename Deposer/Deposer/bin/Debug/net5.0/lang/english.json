@@ -15,5 +15,17 @@
   "no_selecting_enabled": "There is no action attached to a selected file/directory",
   "menu_navigate": "Navigate",
   "menu_exit": "Exit",
-  "error:not_implemented": "The option has not been implemented yet"
+  "menu_directory_mapper": "Directory mapper",
+  "error:not_implemented": "The option has not been implemented yet",
+  "by": "By",
+  "map_menu_dirmap": "Create map",
+  "menu_back": "Go back",
+  "createmap_what": "Which directory do you want to map?",
+  "createmap_where": "Where do you want to save the map?",
+  "network": "Network",
+  "fixed": "Fixed",
+  "select_new_file": "Select an existing file or the path to create one",
+  "file_exists": "The file {0} already exists",
+  "new_file_name": "Write the name for the new file",
+  "existing_so_override_file": "The file already exists. Do you want to override it?"
 }
