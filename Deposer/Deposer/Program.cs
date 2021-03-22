@@ -27,11 +27,11 @@ namespace Deposer
                 return;
             }
             /* ALL LOADED */
-            Console.Title = "Déposer";
 
             /* MAIN MENU */
             while(true)
             {
+                Console.Title = "Déposer";
                 MainOptions option = Document.Menu<MainOptions>.DisplayMenu(new Document.Menu<MainOptions>[] {
                     new Document.Menu<MainOptions>(Lang.Get("menu_navigate"), MainOptions.navigate),
                     new Document.Menu<MainOptions>(Lang.Get("menu_directory_mapper"), MainOptions.mapper),
@@ -77,7 +77,6 @@ namespace Deposer
                 if (dir.type == Navigator.Type.cancel) return;
                 Document.Load process = new Document.Load(1); // 0%
                 Archive.DirectoryMap mapped = new Archive.DirectoryMap(new DirectoryInfo(dir.path));
-                //Navigator.Element where = Navigator.UnitNavigator(true,false,true,Lang.Get("createmap_where")); // Select destination
                 Navigator.Element where = Navigator.SelectNewFile("json");
                 if (where.type == Navigator.Type.cancel) return;
                 File.WriteAllText(where.path, Newtonsoft.Json.JsonConvert.SerializeObject(mapped));

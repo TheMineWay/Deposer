@@ -88,9 +88,12 @@ namespace Deposer
                         case ConsoleKey.D: CreateDir(dir.FullName); GenerateList(); break;
                         case ConsoleKey.R: if(storedFiles[page].Count > 0) Remove(storedFiles[page][selected]); GenerateList(); break;
                         case ConsoleKey.Enter:
-                            if (storedFiles[page][selected].type != Type.directory) break;
-                            Element action = Navigate(new DirectoryInfo(storedFiles[page][selected].path), directories, files, selecting, title); //Navigate into directory
-                            if (action.type != Type.cancel) return action;
+                            if (storedFiles[page][selected].type == Type.directory)
+                            {
+                                Element action = Navigate(new DirectoryInfo(storedFiles[page][selected].path), directories, files, selecting, title); //Navigate into directory
+                                if (action.type != Type.cancel) return action;
+                            }
+                            else if (storedFiles[page][selected].type == Type.file) FileEditor.Edit(new FileInfo(storedFiles[page][selected].path));
                             break;
                         case ConsoleKey.Spacebar:
                             if(!selecting)
